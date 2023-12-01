@@ -1,0 +1,102 @@
+# Day 1: Trebuchet?!
+
+```elixir
+Mix.install([:kino])
+```
+
+## Section
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = Kino.Input.textarea("input")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = Kino.Input.read(input) |> String.split("\n", trim: true)
+```
+
+## Part 1
+
+```elixir
+Enum.map(input, fn item ->
+  vals =
+    String.split(item, "", trim: true)
+    |> Enum.reduce([], fn elem, acc ->
+      case Integer.parse(elem) do
+        {integer, _} when is_integer(integer) ->
+          [integer | acc]
+
+        :error ->
+          acc
+      end
+    end)
+    |> Enum.reverse()
+
+  {number, _} = Integer.parse("#{List.first(vals)}#{List.last(vals)}")
+  number
+end)
+|> Enum.sum()
+```
+
+## Part 2
+
+```elixir
+Enum.map(input, fn item ->
+  str_replacer = fn
+    "one" ->
+      "one1one"
+
+    "two" ->
+      "two2two"
+
+    "three" ->
+      "three3three"
+
+    "four" ->
+      "four4four"
+
+    "five" ->
+      "five5five"
+
+    "six" ->
+      "six6six"
+
+    "seven" ->
+      "seven7seven"
+
+    "eight" ->
+      "eight8eight"
+
+    "nine" ->
+      "nine9nine"
+  end
+
+  vals =
+    Enum.reduce(
+      Regex.scan(~r/(?=(one|two|three|four|five|six|seven|eight|nine))/, item, capture: :all),
+      item,
+      fn captured, acc ->
+        str = List.to_string(tl(captured))
+        String.replace(acc, str, str_replacer.(str))
+      end
+    )
+    |> String.split("", trim: true)
+    |> Enum.reduce([], fn elem, acc ->
+      case Integer.parse(elem) do
+        {integer, _} when is_integer(integer) ->
+          [integer | acc]
+
+        :error ->
+          acc
+      end
+    end)
+    |> Enum.reverse()
+
+  {number, _} = Integer.parse("#{List.first(vals)}#{List.last(vals)}")
+  number
+end)
+|> Enum.sum()
+```
