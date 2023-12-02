@@ -1,0 +1,96 @@
+# Day 2: Cube Conundrum
+
+```elixir
+Mix.install([:kino])
+```
+
+## Section
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = Kino.Input.textarea("input")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = Kino.Input.read(input) |> String.split("\n", trim: true)
+```
+
+## Part 1
+
+```elixir
+prepared =
+  Enum.map(input, fn item ->
+    String.split(item, ": ")
+    |> Enum.map(fn
+      "Game " <> number ->
+        {number, _} = Integer.parse(number)
+        number
+
+      other ->
+        String.split(other, [", ", "; "])
+        |> Enum.map(&String.split(&1, " "))
+        |> Enum.map(fn [num, color] ->
+          {num, _} = Integer.parse(num)
+          {num, color}
+        end)
+    end)
+  end)
+
+Enum.reduce(prepared, 0, fn [match_num, elemenets], acc ->
+  Enum.map(elemenets, fn
+    {count, "red"} when count > 12 ->
+      1
+
+    {count, "green"} when count > 13 ->
+      1
+
+    {count, "blue"} when count > 14 ->
+      1
+
+    _ ->
+      0
+  end)
+  |> Enum.sum()
+  |> case do
+    sum when sum > 0 ->
+      acc
+
+    _ ->
+      match_num + acc
+  end
+end)
+```
+
+## Part 2
+
+```elixir
+prepared =
+  Enum.map(input, fn item ->
+    String.split(item, ": ")
+    |> Enum.map(fn
+      "Game " <> number ->
+        {number, _} = Integer.parse(number)
+        number
+
+      other ->
+        String.split(other, [", ", "; "])
+        |> Enum.map(&String.split(&1, " "))
+        |> Enum.map(fn [num, color] ->
+          {num, _} = Integer.parse(num)
+          {num, color}
+        end)
+    end)
+  end)
+
+Enum.reduce(prepared, 0, fn [_, elemenets], acc ->
+  Enum.group_by(elemenets, &elem(&1, 1), &elem(&1, 0))
+  |> Enum.map(fn {_, elements} ->
+    Enum.max(elements)
+  end)
+  |> Enum.product()
+  |> Kernel.+(acc)
+end)
+```
